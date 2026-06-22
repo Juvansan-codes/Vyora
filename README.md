@@ -1,4 +1,4 @@
-# 🌍 WanderSync: The Next-Generation AI Trip Planner
+# 🌍 Vyora: The Next-Generation AI Trip Planner
 
 [![AI Powered](https://img.shields.io/badge/AI-Powered-blue.svg)](#) [![Hackathon Submission](https://img.shields.io/badge/Hackathon-Submission-success.svg)](#)
 
@@ -6,7 +6,7 @@
 
 ## 🚀 The Vision
 
-Planning a trip should be as exciting as the journey itself. However, modern travel planning is fragmented across dozens of tabs, apps, and spreadsheets. **WanderSync** centralizes the travel experience, leveraging advanced AI to transform hours of tedious research into minutes of delightful discovery. We don't just plan trips; we curate unforgettable experiences.
+Planning a trip should be as exciting as the journey itself. However, modern travel planning is fragmented across dozens of tabs, apps, and spreadsheets. **Vyora** centralizes the travel experience, leveraging advanced AI to transform hours of tedious research into minutes of delightful discovery. We don't just plan trips; we curate unforgettable experiences.
 
 ---
 
