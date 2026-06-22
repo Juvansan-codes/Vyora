@@ -38,8 +38,8 @@ Built for scale, usability, and delight:
 
 *(Customize this section based on your actual stack)*
 - **Frontend:** Next.js, React, Tailwind CSS
-- **Backend/Database:** Supabase (PostgreSQL), Edge Functions
-- **AI/ML:** LLM integrations for NLP, reasoning, and data synthesis
+- **Backend/Database:** MongoDB Atlas
+- **AI/ML:** Groq API (High-speed LLM inference) for NLP, reasoning, and data synthesis
 - **Mapping:** Google Maps API / Mapbox
 
 ---
@@ -51,19 +51,3 @@ Built for scale, usability, and delight:
 
 ---
 
-## 🚀 Getting Started
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   ```
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Set up environment variables:**
-   Create a `.env.local` file and add your necessary database and AI provider keys.
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
