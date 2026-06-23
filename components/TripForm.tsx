@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 
-export default function TripForm({ onTripCreated, initialData, onCancel }: any) {
+import { Trip } from '@/types';
+
+interface TripFormProps {
+  onTripCreated: () => void;
+  initialData?: Trip;
+  onCancel?: () => void;
+}
+
+export default function TripForm({ onTripCreated, initialData, onCancel }: TripFormProps) {
   const [destination, setDestination] = useState(initialData?.destination || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [status, setStatus] = useState(initialData?.status || 'planning');

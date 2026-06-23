@@ -4,10 +4,11 @@ import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import TripList from '@/components/TripList';
 import TripForm from '@/components/TripForm';
+import { Trip } from '@/types';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
-  const [trips, setTrips] = useState<any[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchTrips = async () => {

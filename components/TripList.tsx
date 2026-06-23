@@ -3,7 +3,14 @@
 import { useState } from 'react';
 import TripForm from './TripForm';
 
-export default function TripList({ trips, onTripUpdated }: any) {
+import { Trip } from '@/types';
+
+interface TripListProps {
+  trips: Trip[];
+  onTripUpdated: () => void;
+}
+
+export default function TripList({ trips, onTripUpdated }: TripListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -32,7 +39,7 @@ export default function TripList({ trips, onTripUpdated }: any) {
 
   return (
     <div className="space-y-4">
-      {trips.map((trip: any) => (
+      {trips.map((trip) => (
         <div key={trip._id} className="border border-gray-200 p-5 hover:border-black transition-colors">
           {editingId === trip._id ? (
             <div className="bg-gray-50 p-4 -mx-5 -my-5 border-b border-black">
