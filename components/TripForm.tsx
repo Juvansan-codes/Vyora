@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-
 import { Trip } from '@/types';
 
 interface TripFormProps {
@@ -47,43 +46,59 @@ export default function TripForm({ onTripCreated, initialData, onCancel }: TripF
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6 xl:space-y-8">
       <div>
-        <label className="block text-sm font-medium text-black">Destination</label>
+        <label className="block text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
+          Destination
+        </label>
         <input
           type="text"
           required
-          className="mt-1 block w-full border border-gray-300 px-3 py-2 text-black bg-white focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="block w-full border-b border-surface-container py-3 xl:py-4 px-1 text-on-surface placeholder-secondary/55 bg-transparent focus:border-b-2 focus:border-primary focus:outline-none transition-all text-body-md xl:text-base"
+          placeholder="e.g. Kyoto, Japan"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
         />
       </div>
+      
       <div>
-        <label className="block text-sm font-medium text-black">Description</label>
+        <label className="block text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
+          Description
+        </label>
         <textarea
           rows={3}
-          className="mt-1 block w-full border border-gray-300 px-3 py-2 text-black bg-white focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="block w-full border-b border-surface-container py-3 xl:py-4 px-1 text-on-surface placeholder-secondary/55 bg-transparent focus:border-b-2 focus:border-primary focus:outline-none transition-all text-body-md xl:text-base resize-none"
+          placeholder="Add trip notes, flights or hotel details..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </div>
+      
       <div>
-        <label className="block text-sm font-medium text-black">Status</label>
-        <select
-          className="mt-1 block w-full border border-gray-300 px-3 py-2 text-black bg-white focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as Trip['status'])}
-        >
-          <option value="planning">Planning</option>
-          <option value="booked">Booked</option>
-          <option value="completed">Completed</option>
-        </select>
+        <label className="block text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
+          Status
+        </label>
+        <div className="relative">
+          <select
+            className="block w-full border-b border-surface-container py-3 xl:py-4 px-1 text-on-surface bg-transparent focus:border-b-2 focus:border-primary focus:outline-none transition-all text-body-md xl:text-base appearance-none cursor-pointer"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as Trip['status'])}
+          >
+            <option value="planning" className="bg-white text-on-surface">Planning (Upcoming)</option>
+            <option value="booked" className="bg-white text-on-surface">Booked (Confirmed)</option>
+            <option value="completed" className="bg-white text-on-surface">Completed</option>
+          </select>
+          <span className="material-symbols-outlined text-secondary absolute right-2 top-3 pointer-events-none text-lg">
+            expand_more
+          </span>
+        </div>
       </div>
-      <div className="flex space-x-3 pt-2">
+
+      <div className="flex gap-4 pt-2 xl:pt-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 justify-center bg-black py-2 px-4 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50"
+          className="flex-1 justify-center bg-primary-container text-on-primary-container py-3 xl:py-4 px-6 rounded-lg font-headline-md font-semibold hover:shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer text-center text-sm xl:text-base"
         >
           {loading ? 'Saving...' : initialData ? 'Update Trip' : 'Create Trip'}
         </button>
@@ -91,7 +106,7 @@ export default function TripForm({ onTripCreated, initialData, onCancel }: TripF
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 justify-center border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+            className="flex-1 justify-center border border-surface-container bg-white py-3 xl:py-4 px-6 rounded-lg font-headline-md font-semibold text-secondary hover:bg-surface-container-low transition-colors text-center text-sm xl:text-base cursor-pointer"
           >
             Cancel
           </button>

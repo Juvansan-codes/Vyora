@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import TripForm from './TripForm';
-
 import { Trip } from '@/types';
 
 interface TripListProps {
@@ -31,65 +30,122 @@ export default function TripList({ trips, onTripUpdated }: TripListProps) {
 
   if (trips.length === 0) {
     return (
-      <div className="text-center py-12 border border-dashed border-gray-300 text-gray-500">
-        No trips planned yet.
+      <div className="text-center py-16 border border-dashed border-surface-container rounded-2xl text-secondary bg-surface-container-low/40">
+        <span className="material-symbols-outlined text-4xl mb-2 block text-secondary/60">
+          event_busy
+        </span>
+        <p className="font-semibold text-body-lg">No trips planned yet.</p>
+        <p className="text-xs text-secondary/80 mt-1">Start by planning a destination on the left.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {trips.map((trip) => (
-        <div key={trip._id} className="border border-gray-200 p-5 hover:border-black transition-colors">
-          {editingId === trip._id ? (
-            <div className="bg-gray-50 p-4 -mx-5 -my-5 border-b border-black">
-              <TripForm 
-                initialData={trip} 
-                onTripCreated={() => {
-                  setEditingId(null);
-                  onTripUpdated();
-                }}
-                onCancel={() => setEditingId(null)}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <div className="mb-4 sm:mb-0">
-                <h3 className="text-xl font-semibold text-black">{trip.destination}</h3>
-                {trip.description && (
-                  <p className="mt-1 text-sm text-gray-600">{trip.description}</p>
-                )}
-                <div className="mt-3 flex items-center space-x-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wider
-                    ${trip.status === 'planning' ? 'bg-gray-100 text-gray-600' : ''}
-                    ${trip.status === 'booked' ? 'bg-black text-white' : ''}
-                    ${trip.status === 'completed' ? 'bg-white border border-gray-300 text-gray-800' : ''}
-                  `}>
-                    {trip.status}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(trip.createdAt).toLocaleDateString()}
-                  </span>
+    <div className="space-y-4 xl:space-y-6">
+      {trips.map((trip) => {
+        // Status indicator configurations
+        let statusBg = 'bg-surface-container';
+        let statusText = 'text-secondary';
+        let dotColor = 'bg-secondary';
+        
+        if (trip.status === 'planning') {
+          statusBg = 'bg-primary-container/10';
+          statusText = 'text-primary';
+          dotColor = 'bg-primary-container';
+        } else if (trip.status === 'booked') {
+          statusBg = 'bg-surface-container-highest';
+          statusText = 'text-on-surface-variant';
+          dotColor = 'bg-secondary';
+        } else if (trip.status === 'completed') {
+          statusBg = 'bg-green-50';
+          statusText = 'text-green-700';
+          dotColor = 'bg-green-500';
+        }
+
+        return (
+          <div 
+            key={trip._id} 
+            className="border border-surface-container rounded-xl p-6 xl:p-8 bg-white hover:border-surface-container-highest transition-all duration-300 shadow-sm relative group"
+          >
+            {editingId === trip._id ? (
+              <div className="bg-surface-container-low/30 p-4 -mx-6 -my-6 rounded-xl border border-surface-container">
+                <div className="flex justify-between items-center mb-4 border-b border-surface-container pb-2">
+                  <span className="font-bold text-sm text-on-surface">Edit Itinerary</span>
+                  <button 
+                    onClick={() => setEditingId(null)}
+                    className="text-xs text-secondary hover:text-primary transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                <TripForm 
+                  initialData={trip} 
+                  onTripCreated={() => {
+                    setEditingId(null);
+                    onTripUpdated();
+                  }}
+                  onCancel={() => setEditingId(null)}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="space-y-2 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-xl">
+                      location_on
+                    </span>
+                    <h3 className="text-lg xl:text-xl font-bold text-on-surface leading-snug">
+                      {trip.destination}
+                    </h3>
+                  </div>
+                  
+                  {trip.description && (
+                    <p className="text-body-md xl:text-base text-secondary leading-relaxed">
+                      {trip.description}
+                    </p>
+                  )}
+                  
+                  <div className="flex items-center gap-4 pt-2">
+                    {/* Status Badge with Dot */}
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBg} ${statusText}`}>
+                      <span className={`w-2 h-2 rounded-full ${dotColor}`}></span>
+                      {trip.status}
+                    </span>
+                    
+                    {/* Date */}
+                    <span className="text-xs text-secondary font-mono tracking-tight flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">calendar_today</span>
+                      {new Date(trip.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center">
+                  <button
+                    onClick={() => setEditingId(trip._id)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center border border-surface-container text-secondary hover:border-primary hover:text-primary transition-all cursor-pointer shadow-sm hover:shadow"
+                    title="Edit Trip"
+                  >
+                    <span className="material-symbols-outlined text-base">edit</span>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(trip._id)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center border border-surface-container text-secondary hover:border-error hover:text-error transition-all cursor-pointer shadow-sm hover:shadow"
+                    title="Delete Trip"
+                  >
+                    <span className="material-symbols-outlined text-base">delete</span>
+                  </button>
                 </div>
               </div>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => setEditingId(trip._id)}
-                  className="text-sm font-medium text-gray-500 hover:text-black transition-colors underline underline-offset-4"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(trip._id)}
-                  className="text-sm font-medium text-gray-500 hover:text-black transition-colors underline underline-offset-4"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

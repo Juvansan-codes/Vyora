@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Vyora",
-  description: "Minimalist Trip Planner",
+  title: "Vyora | Travel Planning, Simplified",
+  description: "The minimalist's way to organize trips, discover gems, and build itineraries that flow without the noise.",
+  keywords: ["travel planning", "itinerary builder", "trip planner", "travel organization", "vacation planner"],
+  authors: [{ name: "Vyora Inc." }],
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: "#9b4500",
+  openGraph: {
+    title: "Vyora | Travel Planning, Simplified",
+    description: "The minimalist's way to organize trips, discover gems, and build itineraries that flow without the noise.",
+    type: "website",
+    locale: "en_US",
+  },
 };
 
 export default function RootLayout({
@@ -26,9 +31,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-background text-on-background">
         <AuthProvider>
           {children}
         </AuthProvider>
