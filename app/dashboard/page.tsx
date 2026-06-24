@@ -87,6 +87,36 @@ export default function Dashboard() {
 
       {/* Main Container */}
       <main className="mx-auto max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] w-full px-6 lg:px-12 xl:px-20 py-12 xl:py-16 flex-1">
+        {/* AI Trip Planner Card */}
+        <Link
+          href="/dashboard/chat"
+          className="group block mb-10 xl:mb-14 bg-gradient-to-r from-primary-container/20 via-primary-container/10 to-transparent border border-primary-container/30 rounded-2xl p-6 xl:p-8 hover:shadow-lg hover:border-primary-container/50 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-on-primary-container text-2xl">
+                  travel_explore
+                </span>
+              </div>
+              <div>
+                <h2 className="text-lg xl:text-xl font-bold text-on-surface flex items-center gap-2">
+                  AI Trip Planner
+                  <span className="px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container text-label-sm font-semibold">
+                    NEW
+                  </span>
+                </h2>
+                <p className="text-body-md text-secondary mt-0.5">
+                  Chat with Vyora AI to plan your perfect trip — get itineraries, budget estimates, and personalized recommendations.
+                </p>
+              </div>
+            </div>
+            <span className="material-symbols-outlined text-2xl text-primary/40 group-hover:text-primary group-hover:translate-x-1 transition-all hidden sm:block">
+              arrow_forward
+            </span>
+          </div>
+        </Link>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 xl:gap-16 items-start">
           {/* Create Trip Form Column */}
           <div className="lg:col-span-1 lg:sticky lg:top-24 xl:top-28">
