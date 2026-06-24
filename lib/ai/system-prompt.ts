@@ -4,8 +4,11 @@ import { TripMemory } from '@/types/chat';
  * Builds the system prompt for the Vyora AI Trip Planning Assistant.
  * Injects the current trip memory context so the AI can use it.
  */
-export function buildSystemPrompt(memory: TripMemory): string {
+export function buildSystemPrompt(memory: TripMemory, conversationSummary?: string): string {
   const memoryContext = buildMemoryContext(memory);
+  const summaryContext = conversationSummary
+    ? `\n## Previous Conversation Summary\n${conversationSummary}\n`
+    : '';
 
   return `You are **Vyora**, an expert AI Trip Planning Assistant. You help users plan, organize, and optimize their travel itineraries with practical, personalized recommendations.
 
@@ -43,8 +46,8 @@ If the user asks about anything unrelated to travel (coding, homework, medical a
 - Use emojis sparingly for warmth (✈️ 🏨 🗺️ 🍽️)
 
 ## Itinerary Format
-When generating itineraries, use this format:
-\`\`\`
+When generating itineraries, use this exact formatting but DO NOT wrap it in a markdown code block:
+
 ## Day X: [Theme/Area]
 **Morning**
 - Activity (time estimate) — cost estimate
@@ -55,8 +58,8 @@ When generating itineraries, use this format:
 
 🏨 Accommodation: [suggestion]
 💰 Day Total: [estimated cost]
-\`\`\`
 
+${summaryContext}
 ${memoryContext}
 
 Use the trip context above to personalize all your responses. Do not ask for information that has already been provided. If the context is empty, start by asking about their destination and travel preferences.`;
@@ -84,6 +87,7 @@ function buildMemoryContext(memory: TripMemory): string {
   if (memory.interests && memory.interests.length > 0) {
     fields.push(`- **Interests:** ${memory.interests.join(', ')}`);
   }
+  if (memory.tripStatus) fields.push(`- **Trip Status:** ${memory.tripStatus}`);
 
   if (fields.length === 0) {
     return `## Current Trip Context\nNo trip details have been provided yet. Ask the user about their travel plans.`;

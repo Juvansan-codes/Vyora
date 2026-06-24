@@ -15,6 +15,7 @@ Extract ONLY the following fields if mentioned:
 - transportation (string): Preferred transport mode
 - accommodation (string): Preferred accommodation type
 - interests (string[]): Array of interest areas like ["food", "nature", "history"]
+- tripStatus (string): The user's current stage in the travel funnel. MUST be one of: "exploring" (just looking at options), "planning" (building itinerary), "booking" (ready to book flights/hotels), "finalized" (trip is fully booked).
 
 Rules:
 - Return ONLY a valid JSON object with the fields found. Do NOT include fields that are not mentioned.
@@ -32,7 +33,13 @@ User: "Me and my wife want a luxury beach vacation"
 Output: {"travelers":2,"travelStyle":"luxury","interests":["beach"]}
 
 User: "Can you suggest some good restaurants?"
-Output: {}`;
+Output: {}
+
+User: "I'm just looking at options for my summer vacation."
+Output: {"tripStatus":"exploring"}
+
+User: "Help me book my flights to Paris."
+Output: {"destination":"Paris","tripStatus":"booking"}`;
 
 /**
  * Extracts structured travel data from a user message using a fast LLM call.
@@ -95,6 +102,13 @@ export async function extractMemory(
       sanitized.interests = extracted.interests.filter(
         (i: unknown) => typeof i === 'string' && i.length > 0
       );
+    }
+    
+    if (
+      typeof extracted.tripStatus === 'string' &&
+      ['exploring', 'planning', 'booking', 'finalized'].includes(extracted.tripStatus)
+    ) {
+      sanitized.tripStatus = extracted.tripStatus as 'exploring' | 'planning' | 'booking' | 'finalized';
     }
 
     return sanitized;

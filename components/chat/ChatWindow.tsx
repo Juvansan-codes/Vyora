@@ -85,17 +85,21 @@ export default function ChatWindow({
         ) : (
           /* Messages list */
           <div className="max-w-3xl mx-auto py-6 space-y-1 px-4">
-            {messages.map((msg, idx) => (
-              <ChatMessage
-                key={idx}
-                message={msg}
-                isStreaming={
-                  isStreaming &&
-                  idx === messages.length - 1 &&
-                  msg.role === 'assistant'
-                }
-              />
-            ))}
+            {messages.map((msg, idx) => {
+              if (msg.role === 'assistant' && !msg.content) return null;
+
+              return (
+                <ChatMessage
+                  key={idx}
+                  message={msg}
+                  isStreaming={
+                    isStreaming &&
+                    idx === messages.length - 1 &&
+                    msg.role === 'assistant'
+                  }
+                />
+              );
+            })}
 
             {/* Typing indicator — shown only when streaming hasn't started text yet */}
             <TypingIndicator

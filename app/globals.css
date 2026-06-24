@@ -175,26 +175,29 @@ body {
   height: 6px;
   border-radius: 50%;
   background-color: var(--color-secondary);
-  opacity: 0.5;
-  animation: typing-bounce 1.2s ease-in-out infinite;
+  animation: typing-bounce 1.4s ease-in-out infinite both;
 }
 
 @keyframes typing-bounce {
-  0%, 60%, 100% {
+  0%, 80%, 100% {
     transform: translateY(0);
+    opacity: 0.4;
   }
-  30% {
-    transform: translateY(-6px);
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
   }
 }
 
 /* Streaming cursor animation */
-.streaming-message::after {
+.streaming-message .chat-content > *:last-child::after {
   content: '▍';
-  display: inline;
+  display: inline-block;
   animation: cursor-blink 1s step-end infinite;
   color: var(--color-primary);
   font-weight: 300;
+  margin-left: 2px;
+  vertical-align: text-bottom;
 }
 
 @keyframes cursor-blink {

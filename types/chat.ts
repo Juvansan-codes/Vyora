@@ -18,6 +18,7 @@ export interface TripMemory {
   transportation?: string;
   accommodation?: string;
   interests?: string[];
+  tripStatus?: 'exploring' | 'planning' | 'booking' | 'finalized';
 }
 
 // === Conversation (full chat session) ===
@@ -27,6 +28,8 @@ export interface Conversation {
   title: string;
   messages: ChatMessage[];
   memory: TripMemory;
+  conversationSummary?: string;
+  summaryIndex?: number;
   createdAt: string;
   updatedAt: string;
 }

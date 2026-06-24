@@ -23,6 +23,8 @@ export interface IConversation extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  conversationSummary?: string;
+  summaryIndex?: number;
 }
 
 const MessageSchema = new Schema(
@@ -57,6 +59,10 @@ const MemorySchema = new Schema(
     transportation: String,
     accommodation: String,
     interests: [String],
+    tripStatus: {
+      type: String,
+      enum: ['exploring', 'planning', 'booking', 'finalized'],
+    },
   },
   { _id: false }
 );
@@ -78,6 +84,14 @@ const ConversationSchema = new Schema(
     memory: {
       type: MemorySchema,
       default: () => ({}),
+    },
+    conversationSummary: {
+      type: String,
+      default: '',
+    },
+    summaryIndex: {
+      type: Number,
+      default: 0,
     },
   },
   {

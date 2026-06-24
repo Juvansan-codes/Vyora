@@ -2,10 +2,10 @@ import { NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import dbConnect from '@/lib/mongodb';
 import Conversation from '@/lib/models/Conversation';
-import TripMemory from '@/lib/models/TripMemory';
 import getGroqClient, { CHAT_MODEL } from '@/lib/ai/groq';
 import { buildSystemPrompt } from '@/lib/ai/system-prompt';
 import { extractMemory, mergeMemory } from '@/lib/ai/memory-extractor';
+import { summarizeMessages } from '@/lib/ai/summarizer';
 import type { TripMemory as TripMemoryType } from '@/types/chat';
 
 export const runtime = 'nodejs';
@@ -52,27 +52,13 @@ export async function POST(req: NextRequest) {
         title: message.slice(0, 80).trim() || 'New Trip Chat',
         messages: [],
         memory: {},
+        conversationSummary: '',
+        summaryIndex: 0,
       });
     }
 
-    // 3. Load user's working memory
-    let memoryDoc = await TripMemory.findOne({ userId });
-    if (!memoryDoc) {
-      memoryDoc = new TripMemory({ userId });
-    }
-    const currentMemory: TripMemoryType = {
-      destination: memoryDoc.destination,
-      startDate: memoryDoc.startDate,
-      endDate: memoryDoc.endDate,
-      duration: memoryDoc.duration,
-      budget: memoryDoc.budget,
-      currency: memoryDoc.currency,
-      travelers: memoryDoc.travelers,
-      travelStyle: memoryDoc.travelStyle,
-      transportation: memoryDoc.transportation,
-      accommodation: memoryDoc.accommodation,
-      interests: memoryDoc.interests,
-    };
+    // 3. Load conversation memory
+    const currentMemory: TripMemoryType = conversation.memory || {};
 
     // 4. Add user message to conversation
     conversation.messages.push({
@@ -82,13 +68,13 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. Build messages for Groq
-    const systemPrompt = buildSystemPrompt(currentMemory);
+    const systemPrompt = buildSystemPrompt(currentMemory, conversation.conversationSummary);
     const groqMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
       { role: 'system', content: systemPrompt },
     ];
 
-    // Include last 20 messages for context window management
-    const recentMessages = conversation.messages.slice(-20);
+    // Include last 15 messages for context window management
+    const recentMessages = conversation.messages.slice(-15);
     for (const msg of recentMessages) {
       if (msg.role === 'user' || msg.role === 'assistant') {
         groqMessages.push({ role: msg.role, content: msg.content });
@@ -136,27 +122,42 @@ export async function POST(req: NextRequest) {
           });
           await conversation.save();
 
-          // Extract memory in background (non-blocking for the stream)
-          extractMemory(message.trim())
-            .then(async (extracted) => {
+          // Background tasks (non-blocking for the stream)
+          Promise.resolve().then(async () => {
+            try {
+              let needsSave = false;
+
+              // 1. Memory Extraction
+              const extracted = await extractMemory(message.trim());
               if (Object.keys(extracted).length > 0) {
-                const merged = mergeMemory(currentMemory, extracted);
+                conversation.memory = mergeMemory(currentMemory, extracted);
+                needsSave = true;
+              }
 
-                // Update working memory
-                await TripMemory.findOneAndUpdate(
-                  { userId },
-                  { $set: merged },
-                  { upsert: true, new: true }
+              // 2. Summarization
+              const summaryIndex = conversation.summaryIndex || 0;
+              if (conversation.messages.length - summaryIndex > 15) {
+                const numToSummarize = conversation.messages.length - summaryIndex - 15;
+                const messagesToSummarize = conversation.messages.slice(
+                  summaryIndex,
+                  summaryIndex + numToSummarize
                 );
+                
+                conversation.conversationSummary = await summarizeMessages(
+                  conversation.conversationSummary || '',
+                  messagesToSummarize
+                );
+                conversation.summaryIndex = summaryIndex + numToSummarize;
+                needsSave = true;
+              }
 
-                // Update conversation memory snapshot
-                conversation.memory = merged;
+              if (needsSave) {
                 await conversation.save();
               }
-            })
-            .catch((err) => {
-              console.error('[Chat] Memory extraction failed:', err);
-            });
+            } catch (err) {
+              console.error('[Chat] Background tasks failed:', err);
+            }
+          });
 
           // Signal completion
           controller.enqueue(

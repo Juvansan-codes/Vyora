@@ -1,6 +1,7 @@
 'use client';
 
-import { useMarkdown } from '@/hooks/useMarkdown';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { ChatMessage as ChatMessageType } from '@/types/chat';
 
 interface ChatMessageProps {
@@ -9,7 +10,6 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, isStreaming }: ChatMessageProps) {
-  const htmlContent = useMarkdown(message.content);
   const isUser = message.role === 'user';
 
   if (message.role === 'system') return null;
@@ -44,10 +44,11 @@ export default function ChatMessage({ message, isStreaming }: ChatMessageProps) 
         {isUser ? (
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
         ) : message.content ? (
-          <div
-            className="chat-content prose-chat"
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
-          />
+          <div className="chat-content prose-chat">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
+          </div>
         ) : null}
       </div>
     </div>

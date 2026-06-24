@@ -52,7 +52,11 @@ export function useChat(): UseChatReturn {
   // --- Load memory ---
   const loadMemory = useCallback(async () => {
     try {
-      const res = await fetch('/api/memory');
+      if (!activeConversationId) {
+        setMemory({});
+        return;
+      }
+      const res = await fetch(`/api/memory?conversationId=${activeConversationId}`);
       if (res.ok) {
         const data = await res.json();
         setMemory(data);
@@ -60,7 +64,7 @@ export function useChat(): UseChatReturn {
     } catch (err) {
       console.error('Failed to load memory:', err);
     }
-  }, []);
+  }, [activeConversationId]);
 
   // --- Load a specific conversation ---
   const loadConversation = useCallback(async (id: string) => {
@@ -114,14 +118,18 @@ export function useChat(): UseChatReturn {
   // --- Clear memory ---
   const clearMemory = useCallback(async () => {
     try {
-      const res = await fetch('/api/memory', { method: 'DELETE' });
+      if (!activeConversationId) {
+        setMemory({});
+        return;
+      }
+      const res = await fetch(`/api/memory?conversationId=${activeConversationId}`, { method: 'DELETE' });
       if (res.ok) {
         setMemory({});
       }
     } catch (err) {
       console.error('Failed to clear memory:', err);
     }
-  }, []);
+  }, [activeConversationId]);
 
   // --- Send message (with streaming) ---
   const sendMessage = useCallback(
@@ -197,6 +205,9 @@ export function useChat(): UseChatReturn {
               if (data.type === 'meta' && data.conversationId) {
                 setActiveConversationId(data.conversationId);
               } else if (data.type === 'token' && data.content) {
+                // Artificial delay to smooth out the typing speed from fast LLMs like Groq
+                await new Promise((resolve) => setTimeout(resolve, 20));
+
                 setMessages((prev) => {
                   const updated = [...prev];
                   const lastMsg = updated[updated.length - 1];

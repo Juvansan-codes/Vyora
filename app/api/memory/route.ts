@@ -1,79 +1,92 @@
+import { NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import dbConnect from '@/lib/mongodb';
-import TripMemory from '@/lib/models/TripMemory';
+import Conversation from '@/lib/models/Conversation';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await dbConnect();
-
-    const memory = await TripMemory.findOne({ userId: session.user.id }).lean();
-
-    if (!memory) {
+    const conversationId = req.nextUrl.searchParams.get('conversationId');
+    if (!conversationId || conversationId === 'null') {
       return Response.json({});
     }
 
-    // Return only the memory fields, not the mongo document metadata
-    return Response.json({
-      destination: (memory as Record<string, unknown>).destination,
-      startDate: (memory as Record<string, unknown>).startDate,
-      endDate: (memory as Record<string, unknown>).endDate,
-      duration: (memory as Record<string, unknown>).duration,
-      budget: (memory as Record<string, unknown>).budget,
-      currency: (memory as Record<string, unknown>).currency,
-      travelers: (memory as Record<string, unknown>).travelers,
-      travelStyle: (memory as Record<string, unknown>).travelStyle,
-      transportation: (memory as Record<string, unknown>).transportation,
-      accommodation: (memory as Record<string, unknown>).accommodation,
-      interests: (memory as Record<string, unknown>).interests,
-    });
+    await dbConnect();
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      userId: session.user.id,
+    }).lean();
+
+    if (!conversation || !conversation.memory) {
+      return Response.json({});
+    }
+
+    // Return only the memory fields
+    return Response.json(conversation.memory);
   } catch (error) {
     console.error('[Memory API] GET error:', error);
     return Response.json({ error: 'Failed to fetch memory' }, { status: 500 });
   }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { memory } = await req.json();
+    const { conversationId, memory } = await req.json();
+    if (!conversationId || conversationId === 'null') {
+      return Response.json({ error: 'Conversation ID is required' }, { status: 400 });
+    }
+
     if (!memory || typeof memory !== 'object') {
       return Response.json({ error: 'Invalid memory data' }, { status: 400 });
     }
 
     await dbConnect();
 
-    const updated = await TripMemory.findOneAndUpdate(
-      { userId: session.user.id },
-      { $set: memory },
-      { upsert: true, new: true }
+    const updated = await Conversation.findOneAndUpdate(
+      { _id: conversationId, userId: session.user.id },
+      { $set: { memory } },
+      { new: true }
     ).lean();
 
-    return Response.json(updated);
+    if (!updated) {
+       return Response.json({ error: 'Conversation not found' }, { status: 404 });
+    }
+
+    return Response.json(updated.memory || {});
   } catch (error) {
     console.error('[Memory API] PUT error:', error);
     return Response.json({ error: 'Failed to update memory' }, { status: 500 });
   }
 }
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const conversationId = req.nextUrl.searchParams.get('conversationId');
+    if (!conversationId || conversationId === 'null') {
+       return Response.json({ success: true });
+    }
+
     await dbConnect();
 
-    await TripMemory.findOneAndDelete({ userId: session.user.id });
+    await Conversation.findOneAndUpdate(
+      { _id: conversationId, userId: session.user.id },
+      { $set: { memory: {} } }
+    );
 
     return Response.json({ success: true });
   } catch (error) {
