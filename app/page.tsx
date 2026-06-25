@@ -1,6 +1,35 @@
+"use client";
+
+import { motion, Variants } from 'framer-motion';
 import Header from '@/components/Header';
 import TripPreviewWidget from '@/components/TripPreviewWidget';
 import Link from 'next/link';
+
+// Reusable animation variants
+const fadeUpVariant: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const fadeRightVariant: Variants = {
+  hidden: { opacity: 0, x: -30 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const fadeLeftVariant: Variants = {
+  hidden: { opacity: 0, x: 30 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
 
 export default function Home() {
   return (
@@ -17,14 +46,19 @@ export default function Home() {
         {/* Hero Section */}
         <section className="px-6 lg:px-12 xl:px-20 pt-12 pb-32 max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] mx-auto">
           <div className="grid md:grid-cols-2 gap-12 xl:gap-16 2xl:gap-20 items-center">
-            <div className="text-left space-y-6">
-              <h1 className="font-display text-display lg:text-[64px] lg:leading-[1.1] text-on-surface tracking-tight font-bold">
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="text-left space-y-6"
+            >
+              <motion.h1 variants={fadeUpVariant} className="font-display text-display lg:text-[64px] lg:leading-[1.1] text-on-surface tracking-tight font-bold">
                 Travel planning,<br className="hidden lg:block"/> simplified.
-              </h1>
-              <p className="font-body-lg text-body-lg text-secondary max-w-lg leading-relaxed">
+              </motion.h1>
+              <motion.p variants={fadeUpVariant} className="font-body-lg text-body-lg text-secondary max-w-lg leading-relaxed">
                 The minimalist's way to organize trips, discover gems, and build itineraries that flow without the noise.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              </motion.p>
+              <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row gap-4 pt-2">
                 <Link
                   href="/dashboard"
                   className="px-8 py-3 bg-primary-container text-on-primary-container rounded-lg font-headline-md font-semibold text-center shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer"
@@ -37,22 +71,29 @@ export default function Home() {
                 >
                   View Demo
                 </a>
-              </div>
+              </motion.div>
               
-              <div className="mt-6 flex items-center gap-2 pt-4" aria-label="User statistics">
+              <motion.div variants={fadeUpVariant} className="mt-6 flex items-center gap-2 pt-4" aria-label="User statistics">
                 <div className="flex -space-x-2" role="presentation">
                   <div className="w-8 h-8 rounded-full border-2 border-white bg-secondary-container" aria-hidden="true"></div>
                   <div className="w-8 h-8 rounded-full border-2 border-white bg-primary-container" aria-hidden="true"></div>
                   <div className="w-8 h-8 rounded-full border-2 border-white bg-surface-container-highest" aria-hidden="true"></div>
                 </div>
                 <span className="text-label-sm text-secondary font-medium">Joined by 15k+ travelers</span>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div className="relative mt-12 md:mt-0">
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              variants={fadeLeftVariant}
+              className="relative mt-12 md:mt-0"
+            >
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-surface-container">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <motion.img
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   alt="Minimalist train station platform showcasing travel planning inspiration"
                   className="w-full h-full object-cover"
                   loading="eager"
@@ -63,22 +104,34 @@ export default function Home() {
                 />
               </div>
               {/* Floating tag */}
-              <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-surface-container hidden lg:block animate-bounce-slow" aria-label="Saved trip example">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+                className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-surface-container hidden lg:block animate-bounce-slow" 
+                aria-label="Saved trip example"
+              >
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">
                     push_pin
                   </span>
                   <span className="font-label-md text-on-surface font-semibold">Saved: Kyoto Coffee Tour</span>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
         {/* Narrative Section: Features */}
         <section className="px-6 lg:px-12 xl:px-20 py-32 bg-surface-container-lowest border-y border-surface-container" id="features">
           <div className="max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] mx-auto">
-            <div className="text-center mb-24">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeUpVariant}
+              className="text-center mb-24"
+            >
               <span className="font-label-sm text-primary uppercase tracking-[0.2em] mb-2 block font-semibold">
                 Core Philosophy
               </span>
@@ -88,13 +141,22 @@ export default function Home() {
               <p className="text-secondary font-body-lg max-w-2xl mx-auto leading-relaxed">
                 Everything you need to design your perfect getaway, from the first thought to the final destination.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="grid lg:grid-cols-3 gap-6 xl:gap-8 2xl:gap-10">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="grid lg:grid-cols-3 gap-6 xl:gap-8 2xl:gap-10"
+            >
               {/* Feature 1 */}
-              <article className="flex flex-col gap-6 p-6 bg-white rounded-2xl border border-surface-container shadow-sm hover:shadow-md transition-shadow group">
+              <motion.article 
+                variants={fadeUpVariant}
+                className="flex flex-col gap-6 p-6 bg-white rounded-2xl border border-surface-container shadow-sm hover:shadow-md transition-shadow group"
+              >
                 <div className="w-14 h-14 rounded-2xl border border-surface-container flex items-center justify-center bg-white group-hover:border-primary/30 transition-colors" aria-hidden="true">
-                  <span className="material-symbols-outlined text-primary text-3xl">
+                  <span className="material-symbols-outlined text-primary text-3xl group-hover:scale-110 transition-transform">
                     auto_awesome
                   </span>
                 </div>
@@ -107,7 +169,9 @@ export default function Home() {
                   </p>
                   <div className="rounded-xl border border-surface-container overflow-hidden aspect-[4/3] bg-surface-container-low group-hover:shadow-sm transition-shadow">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
                       alt="Minimalist travel inspiration feed user interface"
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -117,12 +181,15 @@ export default function Home() {
                     />
                   </div>
                 </div>
-              </article>
+              </motion.article>
 
               {/* Feature 2 */}
-              <article className="flex flex-col gap-6 p-6 bg-white rounded-2xl border border-surface-container shadow-sm hover:shadow-md transition-shadow group">
+              <motion.article 
+                variants={fadeUpVariant}
+                className="flex flex-col gap-6 p-6 bg-white rounded-2xl border border-surface-container shadow-sm hover:shadow-md transition-shadow group"
+              >
                 <div className="w-14 h-14 rounded-2xl border border-surface-container flex items-center justify-center bg-white group-hover:border-primary/30 transition-colors" aria-hidden="true">
-                  <span className="material-symbols-outlined text-primary text-3xl">
+                  <span className="material-symbols-outlined text-primary text-3xl group-hover:scale-110 transition-transform">
                     drag_indicator
                   </span>
                 </div>
@@ -135,7 +202,9 @@ export default function Home() {
                   </p>
                   <div className="rounded-xl border border-surface-container overflow-hidden aspect-[4/3] bg-surface-container-low group-hover:shadow-sm transition-shadow">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
                       alt="Clean drag-and-drop travel itinerary interface"
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -145,12 +214,15 @@ export default function Home() {
                     />
                   </div>
                 </div>
-              </article>
+              </motion.article>
 
               {/* Feature 3 */}
-              <article className="flex flex-col gap-6 p-6 bg-white rounded-2xl border border-surface-container shadow-sm hover:shadow-md transition-shadow group">
+              <motion.article 
+                variants={fadeUpVariant}
+                className="flex flex-col gap-6 p-6 bg-white rounded-2xl border border-surface-container shadow-sm hover:shadow-md transition-shadow group"
+              >
                 <div className="w-14 h-14 rounded-2xl border border-surface-container flex items-center justify-center bg-white group-hover:border-primary/30 transition-colors" aria-hidden="true">
-                  <span className="material-symbols-outlined text-primary text-3xl">
+                  <span className="material-symbols-outlined text-primary text-3xl group-hover:scale-110 transition-transform">
                     group
                   </span>
                 </div>
@@ -163,7 +235,9 @@ export default function Home() {
                   </p>
                   <div className="rounded-xl border border-surface-container overflow-hidden aspect-[4/3] bg-surface-container-low group-hover:shadow-sm transition-shadow">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
                       alt="Real-time collaboration interface for group travel planning"
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -173,8 +247,8 @@ export default function Home() {
                     />
                   </div>
                 </div>
-              </article>
-            </div>
+              </motion.article>
+            </motion.div>
           </div>
         </section>
 
@@ -182,7 +256,13 @@ export default function Home() {
         <section className="px-6 lg:px-12 xl:px-20 py-32 bg-surface" id="how-it-works">
           <div className="max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] mx-auto space-y-12">
             <div className="flex flex-col lg:flex-row gap-12 xl:gap-16 items-center">
-              <div className="lg:w-1/3 text-left space-y-2">
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={fadeRightVariant}
+                className="lg:w-1/3 text-left space-y-2"
+              >
                 <span className="font-label-sm text-primary uppercase tracking-[0.2em] font-semibold">
                   Interactive
                 </span>
@@ -192,13 +272,27 @@ export default function Home() {
                 <p className="text-secondary font-body-lg leading-relaxed">
                   Experience the interface. Toggle between days, see details, and watch the itinerary come to life.
                 </p>
-              </div>
+              </motion.div>
               
               {/* Trip Preview Widget */}
-              <TripPreviewWidget />
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={fadeLeftVariant}
+                className="lg:w-2/3 w-full"
+              >
+                <TripPreviewWidget />
+              </motion.div>
             </div>
 
-            <div className="text-center pt-4">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUpVariant}
+              className="text-center pt-4"
+            >
               <Link
                 href="/dashboard"
                 className="inline-flex items-center gap-2 text-primary font-label-md text-label-md hover:underline font-semibold group"
@@ -208,26 +302,43 @@ export default function Home() {
                   arrow_forward
                 </span>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Pricing Section */}
         <section className="px-6 lg:px-12 xl:px-20 py-32 bg-surface border-t border-surface-container" id="pricing">
           <div className="max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] mx-auto text-center">
-            <span className="font-label-sm text-primary uppercase tracking-[0.2em] mb-2 block font-semibold">
-              Pricing Plans
-            </span>
-            <h2 className="font-display text-[40px] text-on-surface font-bold mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-secondary font-body-lg max-w-2xl mx-auto leading-relaxed">
-              Choose the tier that matches your travel frequency. Start for free, upgrade whenever you need.
-            </p>
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeUpVariant}
+            >
+              <span className="font-label-sm text-primary uppercase tracking-[0.2em] mb-2 block font-semibold">
+                Pricing Plans
+              </span>
+              <h2 className="font-display text-[40px] text-on-surface font-bold mb-4">
+                Simple, transparent pricing
+              </h2>
+              <p className="text-secondary font-body-lg max-w-2xl mx-auto leading-relaxed">
+                Choose the tier that matches your travel frequency. Start for free, upgrade whenever you need.
+              </p>
+            </motion.div>
 
-              <div className="grid md:grid-cols-2 gap-8 xl:gap-10 max-w-5xl xl:max-w-6xl mx-auto mt-16 text-left">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="grid md:grid-cols-2 gap-8 xl:gap-10 max-w-5xl xl:max-w-6xl mx-auto mt-16 text-left"
+            >
               {/* Hobby Plan */}
-              <article className="flex flex-col justify-between p-8 bg-white border border-surface-container rounded-2xl shadow-sm hover:shadow-md transition-shadow relative">
+              <motion.article 
+                variants={fadeUpVariant}
+                whileHover={{ y: -8 }}
+                className="flex flex-col justify-between p-8 bg-white border border-surface-container rounded-2xl shadow-sm hover:shadow-md transition-all relative"
+              >
                 <div className="space-y-6">
                   <header>
                     <h3 className="font-display text-xl font-bold text-on-surface">Hobby</h3>
@@ -266,10 +377,14 @@ export default function Home() {
                     Get Started Free
                   </Link>
                 </div>
-              </article>
+              </motion.article>
 
               {/* Pro Plan */}
-              <article className="flex flex-col justify-between p-8 bg-white border-2 border-primary rounded-2xl shadow-md hover:shadow-lg transition-shadow relative">
+              <motion.article 
+                variants={fadeUpVariant}
+                whileHover={{ y: -8 }}
+                className="flex flex-col justify-between p-8 bg-white border-2 border-primary rounded-2xl shadow-md hover:shadow-lg transition-all relative"
+              >
                 <div className="absolute -top-4 right-6 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full" aria-label="Recommended plan">
                   Recommended
                 </div>
@@ -315,22 +430,28 @@ export default function Home() {
                     Go Pro
                   </Link>
                 </div>
-              </article>
-            </div>
+              </motion.article>
+            </motion.div>
           </div>
         </section>
 
         {/* CTA Section */}
         <section className="px-6 lg:px-12 xl:px-20 py-32 bg-on-surface text-surface-container-lowest relative overflow-hidden text-center">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--color-primary),_transparent_70%)]"></div>
-          <div className="max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] mx-auto space-y-12 relative z-10">
-            <h2 className="font-display text-[48px] font-bold tracking-tight mb-4 leading-tight text-white">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] mx-auto space-y-12 relative z-10"
+          >
+            <motion.h2 variants={fadeUpVariant} className="font-display text-[48px] font-bold tracking-tight mb-4 leading-tight text-white">
               Ready for your next gem?
-            </h2>
-            <p className="font-body-lg text-body-lg text-white/70 mb-12 max-w-xl mx-auto leading-relaxed">
+            </motion.h2>
+            <motion.p variants={fadeUpVariant} className="font-body-lg text-body-lg text-white/70 mb-12 max-w-xl mx-auto leading-relaxed">
               Join thousands of travelers who have found peace in the planning process.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+            </motion.p>
+            <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
               <Link
                 href="/dashboard"
                 className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-headline-md font-semibold hover:scale-105 transition-all shadow-md text-center"
@@ -343,8 +464,8 @@ export default function Home() {
               >
                 Contact Sales
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
       </main>
 
