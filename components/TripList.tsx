@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import TripForm from './TripForm';
 import { Trip } from '@/types';
+import { motion, useReducedMotion } from 'framer-motion';
+import ConfirmModal from './ConfirmModal';
 
 interface TripListProps {
   trips: Trip[];
@@ -11,12 +13,30 @@ interface TripListProps {
 
 export default function TripList({ trips, onTripUpdated }: TripListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this trip?')) return;
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: shouldReduceMotion ? 0 : 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, y: 0, 
+      transition: { duration: shouldReduceMotion ? 0 : 0.3 } 
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingId) return;
     
     try {
-      const res = await fetch(`/api/trips/${id}`, {
+      const res = await fetch(`/api/trips/${deletingId}`, {
         method: 'DELETE',
       });
 
@@ -25,6 +45,8 @@ export default function TripList({ trips, onTripUpdated }: TripListProps) {
       }
     } catch (error) {
       console.error('Failed to delete trip:', error);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -41,7 +63,12 @@ export default function TripList({ trips, onTripUpdated }: TripListProps) {
   }
 
   return (
-    <div className="space-y-4 xl:space-y-6">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-4 xl:space-y-6"
+    >
       {trips.map((trip) => {
         // Status indicator configurations
         let statusBg = 'bg-surface-container';
@@ -63,9 +90,11 @@ export default function TripList({ trips, onTripUpdated }: TripListProps) {
         }
 
         return (
-          <div 
+          <motion.div 
             key={trip._id} 
-            className="border border-surface-container rounded-xl p-6 xl:p-8 bg-white hover:border-surface-container-highest transition-all duration-300 shadow-sm relative group"
+            variants={itemVariants}
+            whileHover={shouldReduceMotion ? {} : { y: -4, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.12)' }}
+            className="border border-surface-container border-l-[4px] border-l-transparent rounded-xl p-6 xl:p-8 bg-white hover:border-l-primary transition-colors duration-300 shadow-sm relative group"
           >
             {editingId === trip._id ? (
               <div className="bg-surface-container-low/30 p-4 -mx-6 -my-6 rounded-xl border border-surface-container">
@@ -134,7 +163,7 @@ export default function TripList({ trips, onTripUpdated }: TripListProps) {
                     <span className="material-symbols-outlined text-base">edit</span>
                   </button>
                   <button
-                    onClick={() => handleDelete(trip._id)}
+                    onClick={() => setDeletingId(trip._id)}
                     className="w-9 h-9 rounded-full flex items-center justify-center border border-surface-container text-secondary hover:border-error hover:text-error transition-all cursor-pointer shadow-sm hover:shadow"
                     title="Delete Trip"
                   >
@@ -143,9 +172,19 @@ export default function TripList({ trips, onTripUpdated }: TripListProps) {
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
         );
       })}
-    </div>
+
+      <ConfirmModal
+        isOpen={!!deletingId}
+        onClose={() => setDeletingId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Trip"
+        message="Are you sure you want to delete this itinerary? This action cannot be undone."
+        confirmText="Delete"
+        isDestructive={true}
+      />
+    </motion.div>
   );
 }

@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import QuickPreviewModal from './QuickPreviewModal';
+import { motion, useReducedMotion } from 'framer-motion';
+import ConfirmModal from './ConfirmModal';
 
 interface AITripPlanListProps {
   plans: AITripPlan[];
@@ -15,6 +17,17 @@ interface AITripPlanListProps {
 export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListProps) {
   const router = useRouter();
   const [previewPlanId, setPreviewPlanId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [convertingId, setConvertingId] = useState<string | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: shouldReduceMotion ? 0 : 0.1 }
+    }
+  };
 
   const handlePreview = (planId: string) => {
     setPreviewPlanId(planId);
@@ -28,16 +41,17 @@ export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListP
     router.push(`/dashboard/ai-planner?planId=${encodeURIComponent(planId)}`);
   };
 
-  const handleConvert = async (planId: string) => {
-    if (!confirm('Convert this AI plan to a real itinerary?')) return;
+  const confirmConvert = async () => {
+    if (!convertingId) return;
 
     try {
-      const res = await fetch(`/api/ai-trip-plans/${planId}/convert`, {
+      const res = await fetch(`/api/ai-trip-plans/${convertingId}/convert`, {
         method: 'POST',
       });
 
       if (res.ok) {
-        alert('Plan converted to itinerary successfully!');
+        // Optional: show a nice toast instead of alert
+        // alert('Plan converted to itinerary successfully!');
         onPlanUpdated();
       } else {
         const error = await res.json();
@@ -46,14 +60,16 @@ export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListP
     } catch (error) {
       console.error('Failed to convert plan:', error);
       alert('Failed to convert plan. Please try again.');
+    } finally {
+      setConvertingId(null);
     }
   };
 
-  const handleDelete = async (planId: string) => {
-    if (!confirm('Are you sure you want to delete this AI trip plan?')) return;
+  const confirmDelete = async () => {
+    if (!deletingId) return;
 
     try {
-      const res = await fetch(`/api/ai-trip-plans/${planId}`, {
+      const res = await fetch(`/api/ai-trip-plans/${deletingId}`, {
         method: 'DELETE',
       });
 
@@ -65,6 +81,8 @@ export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListP
     } catch (error) {
       console.error('Failed to delete plan:', error);
       alert('Failed to delete plan. Please try again.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -90,7 +108,12 @@ export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListP
 
   return (
     <>
-      <div className="space-y-4 xl:space-y-6">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-4 xl:space-y-6"
+      >
         {plans.map((plan) => (
           <AITripPlanCard
             key={plan._id}
@@ -98,11 +121,11 @@ export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListP
             onPreview={() => handlePreview(plan._id)}
             onExport={() => handleExport(plan._id)}
             onContinue={() => handleContinue(plan._id)}
-            onConvert={() => handleConvert(plan._id)}
-            onDelete={() => handleDelete(plan._id)}
+            onConvert={() => setConvertingId(plan._id)}
+            onDelete={() => setDeletingId(plan._id)}
           />
         ))}
-      </div>
+      </motion.div>
 
       {previewPlanId && (
         <QuickPreviewModal
@@ -110,6 +133,26 @@ export default function AITripPlanList({ plans, onPlanUpdated }: AITripPlanListP
           onClose={() => setPreviewPlanId(null)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!deletingId}
+        onClose={() => setDeletingId(null)}
+        onConfirm={confirmDelete}
+        title="Delete AI Plan"
+        message="Are you sure you want to delete this AI trip plan? This action cannot be undone."
+        confirmText="Delete"
+        isDestructive={true}
+      />
+
+      <ConfirmModal
+        isOpen={!!convertingId}
+        onClose={() => setConvertingId(null)}
+        onConfirm={confirmConvert}
+        title="Convert AI Plan"
+        message="Convert this AI generated plan into a real itinerary? It will be added to Your Itineraries."
+        confirmText="Convert"
+        isDestructive={false}
+      />
     </>
   );
 }

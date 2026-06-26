@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAITripPlanner } from '@/hooks/useAITripPlanner';
 import type { AITripPlan, GeneratedPlan, DayPlan, Hotel, Restaurant, Transport } from '@/types/ai-trip-plan';
+import WeatherWidget from '@/components/WeatherWidget';
 
 // Helpers
 function timeAgo(dateStr: string): string {
@@ -380,7 +381,10 @@ function RightPreview({ plan }: { plan: GeneratedPlan | null }) {
 
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'overview' && (
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-4 animate-in slide-in-from-right-2 duration-300">
+            {plan.destination && (
+              <WeatherWidget destination={plan.destination} />
+            )}
             {plan.overview && (
               <div className="p-3 rounded-xl bg-white border border-surface-container">
                 <p className="text-label-md font-bold text-on-surface/60 uppercase tracking-wider mb-1.5">Overview</p>

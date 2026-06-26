@@ -117,6 +117,16 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+html, body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
 /* Reduce motion for users with motion sensitivity */
 @media (prefers-reduced-motion: reduce) {
   *,

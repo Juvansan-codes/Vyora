@@ -8,12 +8,15 @@ import AITripPlanList from '@/components/AITripPlanList';
 import { Trip } from '@/types';
 import { AITripPlan } from '@/types/ai-trip-plan';
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
+import DashboardSkeleton from '@/components/DashboardSkeleton';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [aiPlans, setAiPlans] = useState<AITripPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const shouldReduceMotion = useReducedMotion();
 
   const fetchTrips = async () => {
     try {
@@ -53,25 +56,16 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  if (status === 'loading' || loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-surface text-sm uppercase tracking-widest text-secondary font-semibold font-sans">
-        <span className="material-symbols-outlined text-primary text-3xl animate-spin mr-2" data-icon="progress_activity">
-          progress_activity
-        </span>
-        Loading dashboard...
-      </div>
-    );
-  }
-
   if (status === 'unauthenticated') {
     return null; // Handled by middleware
   }
 
+  const isLoading = status === 'loading' || loading;
+
   return (
     <div className="min-h-screen bg-surface pb-12 font-sans flex flex-col">
       {/* Navigation */}
-      <nav className="bg-white border-b border-surface-container sticky top-0 z-40">
+      <nav className="bg-white border-b border-black/10 sticky top-0 z-40">
         <div className="mx-auto max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] w-full px-6 lg:px-12 xl:px-20">
           <div className="flex h-16 xl:h-20 justify-between items-center">
             <div className="flex items-center gap-2">
@@ -88,12 +82,21 @@ export default function Dashboard() {
             
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 border-r border-surface-container pr-6">
-                <span className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs uppercase shadow-sm">
-                  {session?.user?.name?.[0] || session?.user?.email?.[0] || 'U'}
-                </span>
-                <span className="text-sm font-semibold text-on-surface hidden sm:inline">
-                  {session?.user?.name || session?.user?.email}
-                </span>
+                {status === 'loading' ? (
+                  <>
+                    <div className="w-8 h-8 rounded-full bg-surface-container animate-pulse"></div>
+                    <div className="w-24 h-4 bg-surface-container rounded animate-pulse hidden sm:block"></div>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+                      {session?.user?.name?.[0] || session?.user?.email?.[0] || 'U'}
+                    </span>
+                    <span className="text-sm font-semibold text-on-surface hidden sm:inline">
+                      {session?.user?.name || session?.user?.email}
+                    </span>
+                  </>
+                )}
               </div>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
@@ -107,11 +110,19 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Container */}
-      <main className="mx-auto max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] w-full px-6 lg:px-12 xl:px-20 py-12 xl:py-16 flex-1">
+      {isLoading ? (
+        <DashboardSkeleton />
+      ) : (
+      <motion.main 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.4, ease: 'easeOut' }}
+        className="mx-auto max-w-[1400px] xl:max-w-[1600px] 2xl:max-w-[1800px] w-full px-6 lg:px-12 xl:px-20 py-12 xl:py-16 flex-1"
+      >
         {/* AI Trip Planner Card */}
         <Link
           href="/dashboard/ai-planner"
-          className="group block mb-10 xl:mb-14 bg-gradient-to-r from-primary-container/20 via-primary-container/10 to-transparent border border-primary-container/30 rounded-2xl p-6 xl:p-8 hover:shadow-lg hover:border-primary-container/50 transition-all"
+          className="group block mb-10 xl:mb-14 bg-white border border-surface-container border-l-[4px] border-l-transparent rounded-2xl p-6 xl:p-8 hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.12)] hover:border-l-primary transition-all duration-200"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -173,7 +184,7 @@ export default function Dashboard() {
                   </h2>
                   <Link
                     href="/dashboard/ai-planner?new=true"
-                    className="px-4 py-2 bg-primary-container text-on-primary-container rounded-lg font-semibold text-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2 bg-surface-container text-on-surface rounded-lg font-semibold text-sm hover:bg-primary hover:text-white hover:shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-1"
                   >
                     <span className="material-symbols-outlined text-base">add</span>
                     Create Plan
@@ -184,7 +195,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </main>
+      </motion.main>
+      )}
     </div>
   );
 }

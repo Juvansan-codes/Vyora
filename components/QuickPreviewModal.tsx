@@ -1,5 +1,6 @@
 import { AITripPlan, DayPlan, Hotel, Restaurant, Transport } from '@/types/ai-trip-plan';
 import { useState, useEffect } from 'react';
+import WeatherWidget from './WeatherWidget';
 
 interface QuickPreviewModalProps {
   planId: string;
@@ -121,6 +122,9 @@ export default function QuickPreviewModal({ planId, onClose }: QuickPreviewModal
           <div className="max-w-3xl mx-auto">
             {activeTab === 'overview' && (
               <div className="space-y-6 animate-in slide-in-from-right-2 duration-300">
+                {generatedPlan.destination && (
+                  <WeatherWidget destination={generatedPlan.destination} />
+                )}
                 {generatedPlan.overview && (
                   <div className="p-5 rounded-2xl bg-white border border-surface-container shadow-sm">
                     <p className="text-label-md font-bold text-on-surface/60 uppercase tracking-wider mb-2 flex items-center gap-1.5"><span className="material-symbols-outlined text-base">summarize</span>Overview</p>

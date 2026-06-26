@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import WeatherWidget from '@/components/WeatherWidget';
 
 // Reuse the category icon helper
 function getCategoryIcon(cat?: string): string {
@@ -110,7 +111,10 @@ export default function TripDetailPage() {
 
           <div className="flex-1 overflow-y-auto bg-surface-container-lowest p-6">
             {activeTab === 'overview' && (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-in slide-in-from-right-2 duration-300">
+                {plan.destination && (
+                  <WeatherWidget destination={plan.destination} />
+                )}
                 {plan.overview && (
                   <div className="p-5 rounded-2xl bg-white border border-surface-container shadow-sm">
                     <p className="text-sm font-bold text-on-surface/60 uppercase tracking-wider mb-2">Overview</p>

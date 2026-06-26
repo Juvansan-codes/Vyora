@@ -1,6 +1,7 @@
 'use client';
 
 import { AITripPlan } from '@/types/ai-trip-plan';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface AITripPlanCardProps {
   plan: AITripPlan;
@@ -19,6 +20,15 @@ export default function AITripPlanCard({
   onDelete,
   onExport,
 }: AITripPlanCardProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, y: 0, 
+      transition: { duration: shouldReduceMotion ? 0 : 0.3 } 
+    }
+  };
+
   // Status badge styling
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -52,7 +62,11 @@ export default function AITripPlanCard({
   };
 
   return (
-    <div className="border border-surface-container rounded-xl p-6 xl:p-8 bg-white hover:border-surface-container-highest transition-all duration-300 shadow-sm relative group">
+    <motion.div 
+      variants={itemVariants}
+      whileHover={shouldReduceMotion ? {} : { y: -4, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.12)' }}
+      className="border border-surface-container border-l-[4px] border-l-transparent rounded-xl p-6 xl:p-8 bg-white hover:border-l-primary transition-colors duration-300 shadow-sm relative group"
+    >
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -172,6 +186,6 @@ export default function AITripPlanCard({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
